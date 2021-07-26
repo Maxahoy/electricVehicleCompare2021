@@ -33,10 +33,10 @@
 		/*
 	##TODO:
 write the actual charts!
-For now start with getting the performance data uploaded into the github page site and read in.
-Once you can get the performance data read in, build the chart without any interactivity -- for now just automatically show it on the index.html
-Then see if you can get it to appear only when pressing the performance button
-Then see if you can get it to disappear when pressing a different button
+
+TODO: make the primary key for the x axis to be 
+make + model + trim all together
+
 Then get the JSON data into the mix
 Then build the other charts
 See if you can get them to appear
@@ -78,24 +78,24 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 //initialize x axis	
 	var x = d3.scaleBand()
 		.range([0, width])
-		.padding(0.3);
+		.padding(0.03);
 	var xAxis = performanceSVG.append("g")
 		.attr("transform", "translate(0," + height + ")")
+
 		
 	//initialize y axis
 	var y = d3.scaleLinear()
 	.range([height, 0]);
 	var yAxis = performanceSVG.append("g")
-	.attr("class", "Y_axis")
-	.text("Time (s)");
+	.attr("class", "Y_axis");
 	
 	//y axis labeling
 	 d3.select("#performance").append("text")
         .attr("transform", "translate(-25,20)rotate(-90)")
         .attr("text-anchor", "end")
-        .attr("x", 0)
-        .attr("y", 60)
-        .text("Time (s)");
+        .attr("x", -30)
+        .attr("y", 90)
+        .text("Time (s)").style("size:16px");
 
 	// add annotation
 	d3.select("#performance").append("text")
