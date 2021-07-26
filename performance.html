@@ -118,13 +118,13 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		
 		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(performanceData) {
 			//you have access to the data (d) in here
-			console.log(performanceData)
+			
 			
 			// columns are 
 			//make,model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
 			
 			//x axis
-			x.domain(performanceData.map(function(d) { return d.model; }))
+			x.domain(performanceData.map(function(d) { return (d.model); }))
 			xAxis
 			//.transition().duration(1000)
 			.call(d3.axisBottom(x)).selectAll("text")
@@ -163,7 +163,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.attr("x", function(d) { return x(d['model']); })
 			.attr("y", function(d) { return y(d[selectedGroup]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
-			.attr("height", function(d) { console.log(height - y(d[selectedGroup]));return height - y(d[selectedGroup]); })
+			.attr("height", function(d) { return height - y(d[selectedGroup]); })
 			//.attr('fill',function(d){ return myColor(d["model"]); })
 			
 			})
