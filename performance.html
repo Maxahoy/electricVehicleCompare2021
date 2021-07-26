@@ -6,6 +6,7 @@
       <title>Electric Car Selector</title>
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <body style = "font-family:verdana;font-size:20px;">
 		<div class="right" style="padding-left:20px;position:relative;font-size:36px;">
 		
@@ -14,15 +15,15 @@
 		    </p>
 		</div>
     
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/performance.html";onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
-	
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/performance.html";onClick="//currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="//currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="//currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;margin:100px 100px 100px 0px" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
+	<p></p>
 	<select id="performanceSelect" title="Select your straight line performance metric">
 		<option value="0 to 60">0 to 60 Time</option>
 		<option value="1/4 Mile Time">1/4 Mile Time</option>
    </select>
-	
+	<p><P>
 	<svg id="performance">
 	
 	</svg>
@@ -50,7 +51,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	
 	
 	
-	var margin = {top : 30, right: 100, bottom: 30, left: 100},
+	var margin = {top : 30, right: 100, bottom: 100, left: 100},
 		width = screen.width - margin.left - margin.right,
 		height = 500 - margin.top - margin.bottom;
 			
@@ -70,10 +71,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		.attr("class","tooltip")
 		.style("font-size", "16px")
 		
-	// A color scale: one color for each group
-    /*var myColor = d3.scaleOrdinal()
-      .domain(['Jaguar','Audi', 'Porsche', 'Volvo', 'Polestar', 'Tesla', 'Volkswagen', 'Ford', 'Mini', 'Nissan', 'Chevrolet', 'Hyundai'])
-      .range(d3.schemeSet2);*/
+
 	
 //initialize x axis	
 	var x = d3.scaleBand()
@@ -93,7 +91,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	 d3.select("#performance").append("text")
         .attr("transform", "translate(-25,20)rotate(-90)")
         .attr("text-anchor", "end")
-        .attr("x", -30)
+        .attr("x", -150)
         .attr("y", 90)
         .text("Time (s)").style("size:16px");
 
@@ -114,39 +112,49 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		
 		
 	//update chart function
-	function updatePerformance(selectedGroup) {
+	function updatePerformance(selectedField) {
 		
 		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(performanceData) {
 			//you have access to the data (d) in here
 			
 			
+			
 			// columns are 
 			//make,model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
 			
+			//sort data based on which group is selected
+			
+			performanceData = performanceData.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
+			
+			// A color scale: one color for each group
+			var myColor = d3.scaleOrdinal().domain(performanceData.make)
+				.range(d3.schemeSet2);
+	  
+			//console.log(sortedData)
 			//x axis
 			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
-			//.transition().duration(1000)
+			.transition().duration(500)
 			.call(d3.axisBottom(x)).selectAll("text")
-			.attr("transform", "translate( 0,0)")
-				.style("text-anchor", "center");
+			.attr("transform", "translate( -10,5)rotate(-45)")
+				.style("text-anchor", "end");
 			
 			// y axis
-			y.domain([0, d3.max(performanceData, function(d) { return + d[selectedGroup] }) ]);
+			y.domain([0, d3.max(performanceData, function(d) { return + d[selectedField] }) ]);
 			yAxis
-			//.transition().duration(1000)
+			.transition().duration(500)
 			.call(d3.axisLeft(y));
 			
 			var mousemovement = function(d) {
 				tooltip.style("opacity", 1)
 				.style("left", (d3.event.pageX+30) + "px")
 				.style("top", (d3.event.pageY+30) + "px")
-				.html("<strong>Make:</strong> <span style='color:red'>" + (d.make).split("_")[0] + "</span><br><strong>Model: </strong> <span style='color:red'>" + d.make_model + "</span><br><strong>" + selectedGroup + ":</strong> <span style='color:red'>" + d[selectedGroup]+ "</span>")
+				.html("<strong>Make:</strong> <span style='color:red'>" + (d.make).split("_")[0] + "</span><br><strong>Model: </strong> <span style='color:red'>" + d.make_model + "</span><br><strong>" + selectedField + ":</strong> <span style='color:red'>" + d[selectedField]+ "</span>")
 			}
 			
 			var mouseleave = function(d) {
 				tooltip
-				//.transition().duration(200)
+				.transition().duration(200)
 				.style("opacity", 0)
 			}
 			
@@ -159,11 +167,11 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			u.enter()
 			.append("rect")
 			.merge(u)
-			//.transition().duration(1000)
-			.attr("x", function(d) { console.log(x(d['make_model']));return x(d['make_model']); })
-			.attr("y", function(d) { return y(d[selectedGroup]); })//either 0 to 60 time
+			.transition().duration(500)
+			.attr("x", function(d) { return x(d['make_model']); })
+			.attr("y", function(d) { return y(d[selectedField]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
-			.attr("height", function(d) { return height - y(d[selectedGroup]); })
+			.attr("height", function(d) { return height - y(d[selectedField]); })
 			//.attr('fill',function(d){ return myColor(d[" make"]); })
 			
 			})
@@ -171,7 +179,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		}
 		
 		updatePerformance("0 to 60");
-		updatePerformance("0 to 60");
+		//updatePerformance("0 to 60");
 			
 		d3.select("#performanceSelect").on("change", function(d) {
 			var selectedOption = d3.select(this).property("value")
