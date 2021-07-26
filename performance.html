@@ -124,7 +124,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			//make,model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
 			
 			//x axis
-			x.domain(performanceData.map(function(d) { return (d.model); }))
+			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
 			//.transition().duration(1000)
 			.call(d3.axisBottom(x)).selectAll("text")

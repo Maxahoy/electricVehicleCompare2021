@@ -1,16 +1,16 @@
-﻿make_model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
-Jaguar I-Pace,,234,76,80,42,4.3,10.4,12.8,109
-Audi e-Tron,Sportback,220,77,76,78,5.1,13.3,13.8,101
-Porsche Taycan,Turbo S,192,68,67,68,2.4,6,10.5,130
-Volvo XC40,Recharge,208,79,85,72,4.3,10.9,12.9,108
-Polestar 2,,230,130,135,125,4.1,10.5,12.7,109
-Tesla Model X,,250,,89,90,3.3,8.3,11.8,116
-Volkswagen ID.4,,250,97,104,89,7.6,26,16,86
-Ford Mustang Mach-E,4WD Premium,270,90,96,84,5.1,13.5,13.8,101
-Mini Cooper Electric,,110,108,115,100,6.1,N/A,14.8,91
-Nissan Leaf,,215,104,114,94,6.8,19.9,15.4,92
-Tesla Model S,Performance,326,97,98,96,2.4,6.1,10.6,126
-Chevrolet Bolt,,259,118,127,108,6.7,,15.2,92
-Hyundai Kona Electric,,258,120,132,108,6.4,17.6,15,94
-Tesla Model Y,Long Range,291,111,116,106,3.6,9.1,12.1,113
-Tesla Model 3,,310,130,136,123,5.1,13.6,13.8,101
+﻿make, make_model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
+Jaguar, Jaguar I-Pace,,234,76,80,42,4.3,10.4,12.8,109
+Audi, Audi e-Tron,Sportback,220,77,76,78,5.1,13.3,13.8,101
+Porsche, Porsche Taycan,Turbo S,192,68,67,68,2.4,6,10.5,130
+Volvo, Volvo XC40,Recharge,208,79,85,72,4.3,10.9,12.9,108
+Polestar, Polestar 2,,230,130,135,125,4.1,10.5,12.7,109
+Tesla, Tesla Model X,,250,,89,90,3.3,8.3,11.8,116
+Volkswagen, Volkswagen ID.4,,250,97,104,89,7.6,26,16,86
+Ford, Ford Mustang Mach-E,4WD Premium,270,90,96,84,5.1,13.5,13.8,101
+Mini, Mini Cooper Electric,,110,108,115,100,6.1,N/A,14.8,91
+Nissan, Nissan Leaf,,215,104,114,94,6.8,19.9,15.4,92
+Tesla, Tesla Model S,Performance,326,97,98,96,2.4,6.1,10.6,126
+Chevrolet, Chevrolet Bolt,,259,118,127,108,6.7,,15.2,92
+Hyundai, Hyundai Kona Electric,,258,120,132,108,6.4,17.6,15,94
+Tesla, Tesla Model Y,Long Range,291,111,116,106,3.6,9.1,12.1,113
+Tesla, Tesla Model 3,,310,130,136,123,5.1,13.6,13.8,101
