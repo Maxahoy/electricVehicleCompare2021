@@ -65,7 +65,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 	//create a tooltip
-	var tooltip_g_ = d3.select("body")
+	var tooltip = d3.select("body")
 		.append("div")
 		.style("opacity",0)
 		.attr("class","tooltip")
@@ -115,22 +115,34 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	function updatePerformance(selectedField) {
 		
 		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(performanceData) {
-			//you have access to the data (d) in here
-			
-			
-			
-			// columns are 
-			//make,model,trim,EPA combined range,EPA MPGe combined,EPA MPGe city,EPA MPGe highway,0 to 60,0 to 100,1/4 Mile Time,1/4 Mile Speed
-			
-			//sort data based on which group is selected
-			
+
 			performanceData = performanceData.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
 			
+
+				
+			var makes = performanceData.map((row) => {
+			return row.make;
+			});
+			
+			for(let i = 0; i < performanceData.length; i++) {
+				makes.push(performanceData[i].make)
+			}
+			//console.log(makes)
+			
+			function uniq(a) {
+				var seen = {};
+				return a.filter(function(item) {
+				return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+				});
+			}
+			//console.log(uniq(makes));
+			
+						//console.log(performanceData['make'].values())
 			// A color scale: one color for each group
-			//var myColor = d3.scaleOrdinal().domain(performanceData.make)
-			///	.range(d3.schemeSet2);
-	  
-			//console.log(sortedData)
+		    var myColor = d3.scaleOrdinal().domain(makes)
+				.range(d3.schemeSet3);
+			
+			
 			//x axis
 			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
@@ -172,7 +184,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.attr("y", function(d) { return y(d[selectedField]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
 			.attr("height", function(d) { return height - y(d[selectedField]); })
-			//.attr('fill',function(d){ return myColor(d[" make"]); })
+			.attr('fill',function(d){ return myColor(d["make"]); })
 			
 			})
 			
@@ -192,6 +204,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 
 	</script>
 
+	<p style="font-size:8px">All data for this comparison is sourced from CarAndDriver's official testing. If a vehicle had no performance testing from C&D, it was not included in the comparison. For that reason, recent releases like the Tesla Model S Plaid or various trim levels of each EV were not available with C&D's testing methodologies.
 	</body>
 	
 </html>
