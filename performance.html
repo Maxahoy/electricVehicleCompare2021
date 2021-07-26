@@ -98,17 +98,52 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	// add annotation
 	d3.select("#performance").append("text")
         .attr("font-size", "smaller")
-        .attr("x", 430)
+        .attr("x", 150)
         .attr("y", 25)
-        .style("fill","green")
-		.text("THIS IS AN ANNOTATION I'm ADDING");
-	d3.select("#gasoline").append("line")
-        .attr("x1", 500)
-        .attr("y1", 55)
-        .attr("x2", 1100)
-        .attr("y2", 90)
+        .style("fill", "red")
+		.text("If you care about straight line performance...");
+	d3.select("#performance").append("text")
+		.attr("font-size", "smaller")
+		.attr("x", 150)
+		.attr("y", 50)
+		.style("fill", "red")
+		.text("I hope you can afford a Tesla or Porsche.");
+	d3.select("#performance").append("line")
+        .attr("x1", 280)
+        .attr("y1", 60)
+        .attr("x2", 280)
+        .attr("y2", 190)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
+	d3.select("#performance").append("line")
+        .attr("x1", 110)
+        .attr("y1", 190)
+        .attr("x2", 280)
+        .attr("y2", 190)
+        .style("stroke","rgb(255,0,0)")
+        .style("stroke-width","2");
+	d3.select("#performance").append("line")
+        .attr("x1", 280)
+        .attr("y1", 190)
+        .attr("x2", 450)
+        .attr("y2", 190)
+        .style("stroke","rgb(255,0,0)")
+        .style("stroke-width","2");
+	d3.select("#performance").append("line")
+        .attr("x1", 450)
+        .attr("y1", 190)
+        .attr("x2", 450)
+        .attr("y2", 210)
+        .style("stroke","rgb(255,0,0)")
+        .style("stroke-width","2");
+	d3.select("#performance").append("line")
+        .attr("x1", 110)
+        .attr("y1", 190)
+        .attr("x2", 110)
+        .attr("y2", 275)
+        .style("stroke","rgb(255,0,0)")
+        .style("stroke-width","2");
+
 		
 		
 	//update chart function
