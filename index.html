@@ -1,3 +1,19 @@
+##TODO:
+write the actual charts!
+For now start with getting the performance data uploaded into the github page site and read in.
+Once you can get the performance data read in, build the chart without any interactivity -- for now just automatically show it on the index.html
+Then see if you can get it to appear only when pressing the performance button
+Then see if you can get it to disappear when pressing a different button
+Then get the JSON data into the mix
+Then build the other charts
+See if you can get them to appear
+
+ev_data is at https://raw.githubusercontent.com/chargeprice/open-ev-data/master/data/ev-data.json
+Might be worth re-hosting that at a frozen point in time so you know it'll work indefinitely
+	Fork it into your own project? Or just copy and re-host it? Make sure to give them credit!!
+
+performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv
+
 <!DOCTYPE html>
 <html>
    <head>
@@ -53,9 +69,9 @@
 		
 	</script>
 	
-	<a onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;">. . . the best Performance</a><br>
-	<a onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;">. . .  the longest Range</a><br>
-	<a onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;">  . . . the fastest Charging</a><br>
+	<a onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
+	<a onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
+	<a onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	
 	</body>
 	
