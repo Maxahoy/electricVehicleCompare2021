@@ -141,7 +141,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 				tooltip.style("opacity", 1)
 				.style("left", (d3.event.pageX+30) + "px")
 				.style("top", (d3.event.pageY+30) + "px")
-				.html("<strong>Make:</strong> <span style='color:red'>" + (d.make).split("_")[0] + "</span><br><strong>Model: </strong> <span style='color:red'>" + d.model + "</span><br><strong>" + selectedGroup + ":</strong> <span style='color:red'>" + d[selectedGroup]+ "</span>")
+				.html("<strong>Make:</strong> <span style='color:red'>" + (d.make).split("_")[0] + "</span><br><strong>Model: </strong> <span style='color:red'>" + d.make_model + "</span><br><strong>" + selectedGroup + ":</strong> <span style='color:red'>" + d[selectedGroup]+ "</span>")
 			}
 			
 			var mouseleave = function(d) {
@@ -160,7 +160,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.append("rect")
 			.merge(u)
 			//.transition().duration(1000)
-			.attr("x", function(d) { return x(d['make_model']); })
+			.attr("x", function(d) { console.log(x(d['make_model']));return x(d['make_model']); })
 			.attr("y", function(d) { return y(d[selectedGroup]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
 			.attr("height", function(d) { return height - y(d[selectedGroup]); })
