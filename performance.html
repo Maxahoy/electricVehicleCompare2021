@@ -19,8 +19,8 @@
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="//currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="//currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;margin:100px 100px 100px 0px" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
-	<select id="performanceSelect" title="Select your straight line performance metric">
-		<option value="0 to 60">0 to 60 Time</option>
+	<select id="performanceSelect" title="Select your straight line performance metric (mph)">
+		<option value="0 to 60 mph">0 to 60 Time</option>
 		<option value="1/4 Mile Time">1/4 Mile Time</option>
    </select>
 	<p><P>
@@ -118,8 +118,6 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 
 			performanceData = performanceData.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
 			
-
-				
 			var makes = performanceData.map((row) => {
 			return row.make;
 			});
@@ -127,22 +125,18 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			for(let i = 0; i < performanceData.length; i++) {
 				makes.push(performanceData[i].make)
 			}
-			//console.log(makes)
-			
+
 			function uniq(a) {
 				var seen = {};
 				return a.filter(function(item) {
 				return seen.hasOwnProperty(item) ? false : (seen[item] = true);
 				});
 			}
-			//console.log(uniq(makes));
-			
-						//console.log(performanceData['make'].values())
+
 			// A color scale: one color for each group
 		    var myColor = d3.scaleOrdinal().domain(makes)
 				.range(d3.schemeSet3);
-			
-			
+
 			//x axis
 			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
@@ -161,7 +155,18 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 				tooltip.style("opacity", 1)
 				.style("left", (d3.event.pageX+30) + "px")
 				.style("top", (d3.event.pageY+30) + "px")
-				.html("<strong>Make:</strong> <span style='color:red'>" + (d.make).split("_")[0] + "</span><br><strong>Model: </strong> <span style='color:red'>" + d.make_model + "</span><br><strong>" + selectedField + ":</strong> <span style='color:red'>" + d[selectedField]+ "</span>")
+				.html("<strong>Make:</strong> <span style='color:red'>" + 
+				(d.make).split("_")[0] 
+				+ "</span><br><strong>Model: </strong> <span style='color:red'>" + 
+				d.make_model 
+				+ "</span><br><strong>" + 
+				selectedField + 
+				":</strong> <span style='color:red'>" + 
+				d[selectedField]+ "</span>"
+				+ "<span><br><strong>EPA Combined Range (miles): </strong> <span style='color:red'>" + d["EPA combined range"]
+				+ "</span><br><strong>1/4 mile finishing speed: </strong> <span style='color:red'>" + d["1/4 Mile Speed"] + "</span>")
+				
+				
 			}
 			
 			var mouseleave = function(d) {
@@ -186,12 +191,13 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.attr("height", function(d) { return height - y(d[selectedField]); })
 			.attr('fill',function(d){ return myColor(d["make"]); })
 			
+			
 			})
 			
 		}
-		
+		//have to run this twice for some reason to get the tool tip working?
 		updatePerformance("0 to 60");
-		//updatePerformance("0 to 60");
+		updatePerformance("0 to 60");
 			
 		d3.select("#performanceSelect").on("change", function(d) {
 			var selectedOption = d3.select(this).property("value")
