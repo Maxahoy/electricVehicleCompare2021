@@ -160,7 +160,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.append("rect")
 			.merge(u)
 			//.transition().duration(1000)
-			.attr("x", function(d) { return x(d['model']); })
+			.attr("x", function(d) { return x(d['make_model']); })
 			.attr("y", function(d) { return y(d[selectedGroup]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
 			.attr("height", function(d) { return height - y(d[selectedGroup]); })
