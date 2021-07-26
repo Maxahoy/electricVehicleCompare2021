@@ -14,6 +14,11 @@
 		    </p>
 		</div>
     
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/performance.html";onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
+	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
+	
+	
 	<svg>
 	
 	</svg>
@@ -92,21 +97,22 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		
 	var x = d3.scaleBand()
 		.range([0, width])
-		.padding(0, 5);
+		.padding(0.3);
 	var xAxis = performanceSVG.append("g")
 		.attr("transform", "translate(0," + height + ")")
 		
 	//initialize y axis
+	var y = d3.scaleLinear()
+	.range([height, 0]);
+	var yAxis = performanceSVG.append("g")
+	.attr("class", "Y_axis")
+	.text("Time (s)");
 
 		
 	let data = await d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv");
 	
 	</script>
-	
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/performance.html";onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
-	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
-	
+
 	</body>
 	
 </html>
