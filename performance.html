@@ -7,7 +7,7 @@
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
 	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <body style = "font-family:verdana;font-size:20px;">
+    <body style = "font-family:verdana;font-size:20px;" id = "tooltipBody">
 		<div class="right" style="padding-left:20px;position:relative;font-size:36px;">
 		
 		    <p>
@@ -65,15 +65,28 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 	//create a tooltip
+	// the div you're looking for is #tooltipBody
+	var tooltip = d3.select("#tooltipBody")
+	.append("div")//.style("top", (event.pageY)+"px")
+	//.style("left",(event.pageX)+"px")
+	.style("opacity",0)
+	.attr("class","tooltip")
+	.style("background-color","white")
+	.style("border","solid")
+	.style("border-width","2px")
+	.style("border-radius","5px")
+	.style("padding","5px")
+	
+	/*
 	var tooltip = d3.select("body")
 		.append("div")
-		.style("opacity",0)
-		.attr("class","tooltip")
-		.style("font-size", "16px")
-		
-
-	
-//initialize x axis	
+		.attr("id", "mytooltip")
+		.style("position", "absolute")
+		.style("z-index", "10")
+		.style("visibility", "hidden")
+		.text("a simple tooltip");
+	*/
+	//initialize x axis	
 	var x = d3.scaleBand()
 		.range([0, width])
 		.padding(0.03);
@@ -112,35 +125,35 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
         .attr("x1", 280)
         .attr("y1", 60)
         .attr("x2", 280)
-        .attr("y2", 190)
+        .attr("y2", 100)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
 	d3.select("#performance").append("line")
         .attr("x1", 110)
-        .attr("y1", 190)
+        .attr("y1", 100)
         .attr("x2", 280)
-        .attr("y2", 190)
+        .attr("y2", 100)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
 	d3.select("#performance").append("line")
         .attr("x1", 280)
-        .attr("y1", 190)
+        .attr("y1", 100)
         .attr("x2", 450)
-        .attr("y2", 190)
+        .attr("y2", 100)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
 	d3.select("#performance").append("line")
         .attr("x1", 450)
-        .attr("y1", 190)
+        .attr("y1", 100)
         .attr("x2", 450)
-        .attr("y2", 210)
+        .attr("y2", 130)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
 	d3.select("#performance").append("line")
         .attr("x1", 110)
-        .attr("y1", 190)
+        .attr("y1", 100)
         .attr("x2", 110)
-        .attr("y2", 275)
+        .attr("y2", 140)
         .style("stroke","rgb(255,0,0)")
         .style("stroke-width","2");
 
@@ -172,6 +185,9 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		    var myColor = d3.scaleOrdinal().domain(makes)
 				.range(d3.schemeSet3);
 
+
+			
+   
 			//x axis
 			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
@@ -186,10 +202,17 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.transition().duration(500)
 			.call(d3.axisLeft(y));
 			
-			var mousemovement = function(d) {
+			var mouseoverFunction = function(d) {
+				tooltip.style("opacity",1)
+				d3.select(this)
+					.style("stroke","black")
+					.style("opacity",1)
+			}
+			
+			var mouseMove = function(d) {
 				tooltip.style("opacity", 1)
-				.style("left", (d3.event.pageX+30) + "px")
-				.style("top", (d3.event.pageY+30) + "px")
+				.style("left", (d3.mouse(this)[0])+"px")
+				.style("top", (d3.mouse(this)[1]) + "px")
 				.html("<strong>Make:</strong> <span style='color:red'>" + 
 				(d.make).split("_")[0] 
 				+ "</span><br><strong>Model: </strong> <span style='color:red'>" + 
@@ -201,24 +224,23 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 				+ "<span><br><strong>EPA Combined Range (miles): </strong> <span style='color:red'>" + d["EPA combined range"]
 				+ "</span><br><strong>1/4 mile finishing speed: </strong> <span style='color:red'>" + d["1/4 Mile Speed"] + "</span>")
 				
-				
 			}
 			
-			var mouseleave = function(d) {
-				tooltip
-				.transition().duration(200)
-				.style("opacity", 0)
+			var mouseLeave = function(d){
+				tooltip.style("opacity",0)
+				d3.select(this)
+					.style("stroke", "none")
+					.style("opacity", 0.8)
 			}
 			
 			//variable mapping data to bars
 			var u = performanceSVG.selectAll("rect")
 			.data(performanceData)
-			.on('mousemove', mousemovement)
-			.on("mouseout", mouseleave);
-			
-			u.enter()
+			.on("mouseover", mouseoverFunction)
+			.on('mousemove', mouseMove)
+			.on("mouseout", mouseLeave)
+			.enter()
 			.append("rect")
-			.merge(u)
 			.transition().duration(500)
 			.attr("x", function(d) { return x(d['make_model']); })
 			.attr("y", function(d) { return y(d[selectedField]); })//either 0 to 60 time
@@ -240,9 +262,6 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			updatePerformance(selectedOption)
 		})
 		
-	
-		
-
 	</script>
 
 	<p style="font-size:8px">All data for this comparison is sourced from CarAndDriver's official testing. If a vehicle had no performance testing from C&D, it was not included in the comparison. For that reason, recent releases like the Tesla Model S Plaid or various trim levels of each EV were not available with C&D's testing methodologies.
