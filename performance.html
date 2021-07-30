@@ -20,7 +20,7 @@
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="//currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;margin:100px 100px 100px 0px" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
 	<select id="performanceSelect" title="Select your straight line performance metric (mph)">
-		<option value="0 to 60 mph">0 to 60 Time</option>
+		<option value="0 to 60">0 to 60 Time</option>
 		<option value="1/4 Mile Time">1/4 Mile Time</option>
    </select>
 	<p><P>
@@ -51,9 +51,9 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	
 	
 	
-	var margin = {top : 30, right: 100, bottom: 100, left: 100},
-		width = screen.width - margin.left - margin.right,
-		height = 500 - margin.top - margin.bottom;
+	var margin = {top : 30, right: 100, bottom: 50, left: 100},
+		width = 1400 - margin.left - margin.right,
+		height = 300 - margin.top - margin.bottom;
 			
 		
 	
@@ -162,10 +162,10 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	//update chart function
 	function updatePerformance(selectedField) {
 		
-		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(performanceData) {
+		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(data) {
 
-			performanceData = performanceData.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
-			
+			performanceData = data.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
+			console.log(performanceData);
 			var makes = performanceData.map((row) => {
 			return row.make;
 			});
@@ -236,16 +236,19 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			//variable mapping data to bars
 			var u = performanceSVG.selectAll("rect")
 			.data(performanceData)
-			.on("mouseover", mouseoverFunction)
+			.on('mouseover', mouseoverFunction)
 			.on('mousemove', mouseMove)
-			.on("mouseout", mouseLeave)
-			.enter()
+			.on("mouseout", mouseLeave);
+			
+			
+			u.enter()
 			.append("rect")
+			.merge(u)
 			.transition().duration(500)
 			.attr("x", function(d) { return x(d['make_model']); })
-			.attr("y", function(d) { return y(d[selectedField]); })//either 0 to 60 time
+			.attr("y", function(d) {console.log(y(d[selectedField])); return y(d[selectedField]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
-			.attr("height", function(d) { return height - y(d[selectedField]); })
+			.attr("height", function(d) {console.log(y(d[selectedField])); return height - y(d[selectedField]); })
 			.attr('fill',function(d){ return myColor(d["make"]); })
 			
 			
