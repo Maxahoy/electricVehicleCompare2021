@@ -162,7 +162,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	//update chart function
 	function updatePerformance(selectedField) {
 		
-		d3.csv("https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv", function(data) {
+		d3.csv("https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/31aca7cb5036bea2f63c10304406ea1fba7b43c1/CarAndDriver_EV_dataset.csv", function(data) {
 
 			performanceData = data.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
 			console.log(performanceData);
