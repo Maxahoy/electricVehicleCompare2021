@@ -3,7 +3,7 @@
 <html>
    <head>
    <meta charset="utf-8">
-      <title>Electric Car Selector</title>
+      <title>Electric Car Performance</title>
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
 	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -185,9 +185,6 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		    var myColor = d3.scaleOrdinal().domain(makes)
 				.range(d3.schemeSet3);
 
-
-			
-   
 			//x axis
 			x.domain(performanceData.map(function(d) { return (d.make_model); }))
 			xAxis
@@ -255,9 +252,6 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			})
 			
 		}
-		//have to run this twice for some reason to get the tool tip working?
-		updatePerformance("0 to 60");
-		updatePerformance("0 to 60");
 			
 		d3.select("#performanceSelect").on("change", function(d) {
 			var selectedOption = d3.select(this).property("value")
@@ -265,6 +259,10 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			updatePerformance(selectedOption)
 		})
 		
+	//not sure why this needs to be run twice, but it does...?
+	//these two just kickstart things, after this it allows the user to just select their preferred view
+	updatePerformance("0 to 60");
+	updatePerformance("0 to 60");	
 	</script>
 
 	<p style="font-size:8px">All data for this comparison is sourced from CarAndDriver's official testing. If a vehicle had no performance testing from C&D, it was not included in the comparison. For that reason, recent releases like the Tesla Model S Plaid or various trim levels of each EV were not available with C&D's testing methodologies.

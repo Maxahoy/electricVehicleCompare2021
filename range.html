@@ -3,7 +3,7 @@
 <html>
    <head>
    <meta charset="utf-8">
-      <title>Electric Car Selector</title>
+      <title>Electric Car Range</title>
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
 	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -19,9 +19,9 @@
 	<a style="font-size:20px;color:black;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
-	<select id="performanceSelect" title="Select your straight line performance metric (mph)">
-		<option value="0 to 60">0 to 60 Time</option>
-		<option value="1/4 Mile Time">1/4 Mile Time</option>
+	<p>Select your minimum preferred EV range, in kilometers.</p>
+	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="1" max="1000" value="0">
+
    </select>
 	<p><P>
 	<svg id="range">
@@ -33,23 +33,16 @@
 	
 		/*
 	##TODO:
-write the actual charts!
-For now start with getting the performance data uploaded into the github page site and read in.
-Once you can get the performance data read in, build the chart without any interactivity -- for now just automatically show it on the index.html
-Then see if you can get it to appear only when pressing the performance button
-Then see if you can get it to disappear when pressing a different button
-Then get the JSON data into the mix
-Then build the other charts
-See if you can get them to appear
+Import the json data
+Build the scatter plot
+In the update loop as well
+No transitions necessary... but maybe if you feel like it
 
-ev_data is at https://raw.githubusercontent.com/chargeprice/open-ev-data/master/data/ev-data.json
-Might be worth re-hosting that at a frozen point in time so you know it'll work indefinitely
-	Fork it into your own project? Or just copy and re-host it? Make sure to give them credit!!
 
-performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv
 	*/
-	
-	
+	//for development url: https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json
+		//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
+	var dataURL = "https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json"
 
 	var margin = {top : 30, right: 100, bottom: 100, left: 100},
 		width = 1400 - margin.left - margin.right,
@@ -63,8 +56,64 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+	//tooltip (TODO)
 	
-
+	//x axis
+	/*var x = d3.scaleL()
+		.range([0, width])
+		.padding(0.03);
+	var xAxis = rangeSVG.append("g")  //copied from the performance one...
+		.attr("transform", "translate(0," + height + ")")*/
+		
+		
+	var x = d3.scaleLinear()
+		.range([0, width]);
+	var xAxis = rangeSVG.append("g")
+		.attr("class", "X_axis");
+	
+	
+	//y axis
+	var y = d3.scaleLinear()
+		.range([height, 0]);
+	var yAxis = rangeSVG.append("g")
+		.attr("class", "Y_axis");
+	
+	//update method; input is going to be based on a slider in km
+	function updateRangeChart(minimumRange) {
+	
+		//get json data & process inside function
+		console.log("min " + minimumRange);
+		
+		d3.json(dataURL, function(data) {
+			//console.log(data);
+			/*
+				The json contains several layers
+				
+				First, there's the 293 vehicles in the "data" array read in from the json
+				
+				Also the 40 BRANDS in the "brands" array read in from the json
+				
+				there's also a "meta" array which just contains an update data and a count of vehicles in the dataset
+			*/
+			brands = data.brands
+			vehicles = data.data
+			
+			//calculate range for all of the vehicles in the vehicles list
+			//range (km) = usable_battery_size (kwH) * (100km / avg_energy_consumption (kwH/100km))
+			// trust me I worked it out with the power of algebra
+			
+		
+		})
+	
+	}
+	
+	d3.select("input[type=range]").on("change", function() {
+		var min = d3.select(this).property("value")
+		updateRangeChart(min)
+	});
+	
+	updateRangeChart(0,1000)
 		
 	</script>
 
