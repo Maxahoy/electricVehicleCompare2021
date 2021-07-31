@@ -6,7 +6,8 @@
       <title>Electric Car Selector</title>
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
-    <body style = "font-family:verdana;font-size:20px;">
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <body style = "font-family:verdana;font-size:20px;" id = "tooltipBody">
 		<div class="right" style="padding-left:20px;position:relative;font-size:36px;">
 		
 		    <p>
@@ -17,6 +18,15 @@
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/performance.html";onClick="currentChart = performanceButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title="Click me to see the Performance chart">. . . the best Performance</a><br>
 	<a style="font-size:20px;color:black;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
+	<p></p>
+	<select id="performanceSelect" title="Select your straight line performance metric (mph)">
+		<option value="0 to 60">0 to 60 Time</option>
+		<option value="1/4 Mile Time">1/4 Mile Time</option>
+   </select>
+	<p><P>
+	<svg id="range">
+	
+	</svg>
 	
 	<script>
 	
@@ -40,42 +50,21 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	*/
 	
 	
-	
-		var margin = {top : 30, right: 30, bottom: 30, left: 30},
-			width = screen.width - margin.left - margin.right,
-			height = 400 - margin.top - margin.bottom;
+
+	var margin = {top : 30, right: 100, bottom: 100, left: 100},
+		width = 1400 - margin.left - margin.right,
+		height = 300 - margin.top - margin.bottom;
 			
-		var currentChart;
-		// get svg object to body of page
-		var chartSVG = d3.select
+		
 	
-		//A set of functions to change the chart
-		function performanceButton() {
-			changeChart("Performance");
-			return "Performance";
-		}
-		function rangeButton() {
-			changeChart("Range");
-			return "Range";
-		}
-		function chargingButton() {
-			changeChart("Charging");
-			return "Charging";
-		}
-		
-		// a function to show one of the three charts
-		function changeChart(chartChoice)
-		{
-			if (chartChoice === "Performance") {
-				//showPerformanceChart();
-			} else if (chartChoice === "Range") {
-				//showRangeChart();
-			} else if (chartChoice === "Charging") {
-				//showChargingChart();
-			}	
-			//console.log("chartchoice = " + currentChart);
-		}
-		
+	//select the svg for this page	
+	var rangeSVG = d3.select("#range")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+
 		
 	</script>
 
