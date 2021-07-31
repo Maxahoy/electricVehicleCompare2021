@@ -20,7 +20,7 @@
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
 	<p>Select your minimum preferred EV range, in kilometers.</p>
-	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="1" max="1000" value="0">
+	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="0" max="1000" step="10">
 
    </select>
 	<p><P>
@@ -33,7 +33,7 @@
 	
 		/*
 	##TODO:
-Import the json data
+Import the json data - done
 Build the scatter plot
 In the update loop as well
 No transitions necessary... but maybe if you feel like it
@@ -52,6 +52,7 @@ No transitions necessary... but maybe if you feel like it
 	
 	//select the svg for this page	
 	var rangeSVG = d3.select("#range")
+		.append("svg")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
@@ -83,7 +84,7 @@ No transitions necessary... but maybe if you feel like it
 	function updateRangeChart(minimumRange) {
 	
 		//get json data & process inside function
-		console.log("min " + minimumRange);
+		//console.log("min " + minimumRange);
 		
 		d3.json(dataURL, function(data) {
 			//console.log(data);
@@ -98,10 +99,55 @@ No transitions necessary... but maybe if you feel like it
 			*/
 			brands = data.brands
 			vehicles = data.data
+			maxRange = 0
+			minUsableBattery = 0
+			maxUsableBattery = 0
+			minAvgEnergy = 0
+			maxAvgEnergy = 0
+			let remainingVehicles = [];
+			for (let i = 0; i < vehicles.length; i++) {
+				range = vehicles[i].usable_battery_size * (100 / vehicles[i].energy_consumption.average_consumption)
+				
+				if (range > maxRange) {
+					maxRange = range
+				}
+				
+				if (vehicles[i].usable_battery_size < minUsableBattery) {
+					minUsableBattery = vehicles[i].usable_battery_size
+				}
+				
+				if (vehicles[i].usable_battery_size > maxUsableBattery) {
+					maxUsableBattery = vehicles[i].usable_battery_size
+				}
+				
+				if (minAvgEnergy > vehicles[i].energy_consumption.average_consumption) {
+					minAvgEnergy = vehicle[i].energy_consumption.average_consumption
+				}
+				
+				if (maxAvgEnergy < vehicles[i].energy_consumption.average_consumption) {
+					maxAvgEnergy = vehicles[i].energy_consumption.average_consumption
+				}
+				
+
+			}
+			console.log("minusable " + minUsableBattery)
+			console.log("maxusable " + maxUsableBattery)
+			console.log("minavg " + minAvgEnergy)
+			console.log("maxavg " + maxAvgEnergy)
 			
+
 			//calculate range for all of the vehicles in the vehicles list
 			//range (km) = usable_battery_size (kwH) * (100km / avg_energy_consumption (kwH/100km))
 			// trust me I worked it out with the power of algebra
+			
+			//set up scatterplot using x axis data as usable_battery_size
+			// y axis data as range?
+			// or maybe x axis as usable_battery_size and y axis as average_consumption
+			//and color by range, plus the filter on range anyway
+			
+			//x axis attribute changes; make the x axis go from 0 to the max
+			
+			
 			
 		
 		})
