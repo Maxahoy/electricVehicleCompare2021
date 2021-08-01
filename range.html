@@ -19,11 +19,12 @@
 	<a style="font-size:20px;color:black;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
-	<p>Adjust the battery size and see which EV's have the longest range.</p>
+	<p>Sort by either battery size or energy consumption.</p>
 	
+	<select id="rangeSelect" title="Select your battery metric">
+		<option value="usable_battery_size">Usable Battery Size</option>
+		<option value="energy_consumption.average_consumption">Average Energy Consumption</option>
 	
-	<p>Move the slider to change the vehicles shown.
-	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="0" max="200" step="1">
 
 <output></output>
     </select>
@@ -48,8 +49,8 @@ No transitions necessary... but maybe if you feel like it
 		//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
 	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
 
-	var margin = {top : 20, right: 100, bottom: 100, left: 100},
-		width = 800 - margin.left - margin.right,
+	var margin = {top : 20, right: 100, bottom: 90, left: 100},
+		width = 1000 - margin.left - margin.right,
 		height = 450 - margin.top - margin.bottom;
 	
 	//select the svg for this page	
@@ -71,16 +72,7 @@ No transitions necessary... but maybe if you feel like it
 		
 		
 
-	var x = d3.scaleLinear()
-			.range([0, width]);
-		var xAxis = rangeSVG.append("g")
-			.attr("class", "X_axis");
-	
-	//y axis
-	var y = d3.scaleLinear()
-		.range([height, 0]);
-	var yAxis = rangeSVG.append("g")
-		.attr("class", "Y_axis");
+
 		
 	var tooltip = d3.select("#tooltipDiv")
 				.append("div")
@@ -91,14 +83,40 @@ No transitions necessary... but maybe if you feel like it
 				.style("border-radius", "5px")
 				.style("padding", "10px")
 	
+	function clearChart() {
+		//just draw a big white rectangle over the entire SVG?
+		rangeSVG.selectAll("dot").remove();
+		rangeSVG.append("rect")
+		.attr("x", -100)
+		.attr("y", -100)
+		.attr("width", 1000)
+		.attr("height", 1000)
+		.attr("fill", "white");
+	}
+	var x = d3.scaleLinear()
+			.range([0, width]);
+	var xAxis = rangeSVG.append("g")
+		.attr("class", "X_axis");
+	
+	//y axis
+	var y = d3.scaleLinear()
+		.range([height, 0]);
+	var yAxis = rangeSVG.append("g")
+		.attr("class", "Y_axis");
 	//update method; input is going to be based on a slider in km
-	function updateRangeChart(minimumBatterySize) {		
+	function updateRangeChart(batteryMetric) {		
 		
-		/*var x = d3.scaleLinear()
-			.range([minimumBatterySize, width]);
-		var xAxis = rangeSVG.append("g")
-			.attr("class", "X_axis");*/
-			
+	x = d3.scaleLinear()
+		.range([0, width]);
+	xAxis = rangeSVG.append("g")
+		.attr("class", "X_axis");
+
+	y = d3.scaleLinear()
+		.range([height, 0]);	
+		
+	yAxis = rangeSVG.append("g")
+		.attr("class", "Y_axis");
+		
 		d3.json(dataURL, function(data) {
 			//console.log(data);
 			/*
@@ -110,12 +128,10 @@ No transitions necessary... but maybe if you feel like it
 				
 				there's also a "meta" array which just contains an update data and a count of vehicles in the dataset
 			*/
-			//console.log(data.brands)
 			let brands = []
 			for (let i = 0; i < data.brands.length; i++) {
 				brands.push(data.brands[i].name)
 			}
-			console.log(brands)
 			
 			var color = d3.scaleOrdinal().domain(brands)
 				.range(d3.schemeSet3);
@@ -125,52 +141,15 @@ No transitions necessary... but maybe if you feel like it
 				range = data.data[i].usable_battery_size * (100 / data.data[i].energy_consumption.average_consumption)
 				
 				
-				if (range > 50 && range < 1000)
+				if (range > 50 && range < 990)
 				{
 					vehicles.push(data.data[i])
 				}
 
 			}
 			
-			//vehicles = data.data
 			
-			maxRange = 0
-			minUsableBattery = 999999
-			maxUsableBattery = 0
-			minAvgEnergy = 999999
-			maxAvgEnergy = 0
-			let remainingVehicles = [];
-			for (let i = 0; i < vehicles.length; i++) {
-				range = vehicles[i].usable_battery_size * (100 / vehicles[i].energy_consumption.average_consumption)
-				
-				if (range > maxRange) {
-					maxRange = range
-				}
-				
-				if (vehicles[i].usable_battery_size < minUsableBattery) {
-					minUsableBattery = vehicles[i].usable_battery_size
-				}
-				
-				if (vehicles[i].usable_battery_size > maxUsableBattery && vehicles[i].usable_battery_size < 199) {
-					maxUsableBattery = vehicles[i].usable_battery_size
-				}
-				
-				if (minAvgEnergy > vehicles[i].energy_consumption.average_consumption) {
-					minAvgEnergy = vehicles[i].energy_consumption.average_consumption
-				}
-				
-				if (maxAvgEnergy < vehicles[i].energy_consumption.average_consumption) {
-					maxAvgEnergy = vehicles[i].energy_consumption.average_consumption
-				}
-				
-				if (vehicles[i].usable_battery_size > minimumBatterySize && vehicles[i].usable_battery_size < 199)
-				{
-					remainingVehicles.push(vehicles[i])
-				}
-
-
-			}
-			
+			//was hoping to highlight all of a certain color upon being clicked... no luck
 			var onClick = function(d) {
 				d3.selectAll("." + d.brand)
 					//.transition()
@@ -199,12 +178,7 @@ No transitions necessary... but maybe if you feel like it
 				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
 				+ "</span><br><strong>Usable Battery Size (kwH) </strong> <span style='color:red'>" + d.usable_battery_size
 				+ "</span><br><strong>Energy Consumption / 100km </strong> <span style='color:red'>" + d.energy_consumption.average_consumption
-				
-				/* + 
-				":</strong> <span style='color:red'>" + 
-				d[selectedField]+ "</span>"
-				+ "<span><br><strong>EPA Combined Range (miles): </strong> <span style='color:red'>" + d["EPA combined range"]
-				+ "</span><br><strong>1/4 mile finishing speed: </strong> <span style='color:red'>" + d["1/4 Mile Speed"] + "</span>"*/)
+)
 			}
 			
 			var mouseLeave = function(d) {
@@ -218,14 +192,30 @@ No transitions necessary... but maybe if you feel like it
 			//console.log("maxusable " + maxUsableBattery) //200
 			//console.log("minavg " + minAvgEnergy) //4.5
 			//console.log("maxavg " + maxAvgEnergy) //197
+		
 			
-			//calculate range for all of the vehicles in the vehicles list
-			//range (km) = usable_battery_size (kwH) * (100km / avg_energy_consumption (kwH/100km))
-			// trust me I worked it out with the power of algebra
-			
-			//x axis attribute changes; make the x axis go from 0 to the max
-			//x.domain([minimumBatterySize, maxUsableBattery])
-			x.domain([0, maxUsableBattery])
+			//get the max of the selected battery metric
+			maxBatteryMetric = 0
+			for (let i = 0; i < vehicles.length; i++) {
+				
+				if ("energy_consumption.average_consumption".match(batteryMetric))
+				{
+					metric = vehicles[i]['energy_consumption']['average_consumption']
+				}
+				else
+				{
+					metric = vehicles[i][batteryMetric]
+				}
+				
+				if (metric > maxBatteryMetric && maxBatteryMetric < 200)
+				{
+					maxBatteryMetric = metric
+				}
+				
+				
+			}
+
+			x.domain([0, maxBatteryMetric]);
 			xAxis//.transition().duration(500)
 			.attr("transform", "translate(0," + height + ")")
 			.call(d3.axisBottom(x));
@@ -235,58 +225,52 @@ No transitions necessary... but maybe if you feel like it
 			yAxis//.transition().duration(500)
 			.call(d3.axisLeft(y));
 			
-			/*
-				I couldn't figure out how to get data to clear out... so instead, I took the lazy way out
-				And I just draw a white circle over every dot to match the background, before drawing whichever ones I actually want to see
+
 				
-				This draw here basically erases everything.
+			/*
+				This draws the vehicle points that I actually want to look at
 			*/
-			//console.log(rangeSVG)
-			
 			rangeSVG.append("g")
 				.selectAll("dot")
 				.data(vehicles)
 				.enter()
 				.append("circle")//.transition().duration(500)
-				.attr("cx", function(d) {/*console.log( "usable battery: " + x(d.usable_battery_size) );*/ return x(d.usable_battery_size); })
-				.attr("cy", function(d) {/*console.log( "energy consumption: " + y(d.energy_consumption.average_consumption)); */return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
-				.attr("r", 7)
-				.style("fill", "white")
-				.style("opacity", 1)
-				.style("stroke", "white")
-				
-			/*
-				This draws the vehicle points that I actually want to look at
-			*/
-			//console.log(remainingVehicles.length)
-			rangeSVG.append("g")
-				.selectAll("dot")
-				.data(remainingVehicles)
-				.enter()
-				.append("circle")
 				.on("mousemove", mouseMove)
-				.on("mouseleave", mouseLeave)
+				//.on("mouseleave", mouseLeave)
 				.on("mouseover", mouseOver)
-				.on("click", onClick)
-				.attr("cx", function(d) {/*console.log( "usable battery: " + x(d.usable_battery_size) );*/ return x(d.usable_battery_size); })
-				.attr("cy", function(d) {/*console.log( "energy consumption: " + y(d.energy_consumption.average_consumption)); */return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
+				//.on("click", onClick)
+								.attr("cx", function(d) {
+											xScaleInput = 0
+											if ("energy_consumption.average_consumption".match(batteryMetric))
+												{
+													xScaleInput = d['energy_consumption']['average_consumption']
+												}
+											else {
+												xScaleInput = d['usable_battery_size']
+											
+											}
+											return x(xScaleInput); 
+										})
+				.attr("cy", function(d) {return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
 				.attr("r", 7)
-				.style("fill", function (d) {return color(d.brand);}).transition().duration(500)
-				.style("opacity", 1)
+				.style("fill", function (d) {return color(d.brand);})
+				.style("opacity", .5)
 				.style("stroke", "white")
 				
-			//console.log(remainingVehicles.length)
+		
+			
 		
 		})
 	
 	}
 	
-	d3.select("input[type=range]").on("change", function() {
-		var min = d3.select(this).property("value")
-		updateRangeChart(min)
+	d3.select("#rangeSelect").on("change", function() {
+		var selectedOption = d3.select(this).property("value")
+		clearChart();
+		updateRangeChart(selectedOption)
 	});
 	
-	updateRangeChart(0,1000)
+	updateRangeChart("usable_battery_size")
 		
 	</script>
 
