@@ -19,12 +19,11 @@
 	<a style="font-size:20px;color:black;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
-	<p>Sort by either battery size or energy consumption.</p>
+	<p>Choose your X axis variable: battery size, or energy consumption.</p>
 	
 	<select id="rangeSelect" title="Select your battery metric">
 		<option value="usable_battery_size">Usable Battery Size</option>
-		<option value="energy_consumption.average_consumption">Average Energy Consumption</option>
-	
+		<option value="energy_consumption.average_consumption">Average Energy Consumption</option>	
 
 <output></output>
     </select>
@@ -35,18 +34,9 @@
 	<div id="tooltipDiv" style = "font-size:16px;"></div>	
 		<script>
 	
-	
-		/*
-	##TODO:
-Import the json data - done
-Build the scatter plot
-In the update loop as well
-No transitions necessary... but maybe if you feel like it
-
-
-	*/
 	//for development url: https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json
-		//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
+	//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
+	
 	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
 
 	var margin = {top : 20, right: 100, bottom: 90, left: 100},
@@ -60,20 +50,7 @@ No transitions necessary... but maybe if you feel like it
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-		
-	//tooltip (TODO)
 	
-	//x axis
-	/*var x = d3.scaleL()
-		.range([0, width])
-		.padding(0.03);
-	var xAxis = rangeSVG.append("g")  //copied from the performance one...
-		.attr("transform", "translate(0," + height + ")")*/
-		
-		
-
-
-		
 	var tooltip = d3.select("#tooltipDiv")
 				.append("div")
 				.attr("class", "tooltip")
@@ -103,7 +80,18 @@ No transitions necessary... but maybe if you feel like it
 		.range([height, 0]);
 	var yAxis = rangeSVG.append("g")
 		.attr("class", "Y_axis");
-	//update method; input is going to be based on a slider in km
+	
+	// y axis labeling
+	d3.select("#range").append("text")
+		.attr("transform", "translate(-25,20)rotate(-90)")
+		.attr("text-anchor", "end")
+		.attr("x", -90)
+		.attr("y", 85)
+		.text("Range (km)").style("size:16px")
+	
+	
+	
+	// UPDATE RANGE CHART
 	function updateRangeChart(batteryMetric) {		
 		
 	x = d3.scaleLinear()
@@ -129,25 +117,53 @@ No transitions necessary... but maybe if you feel like it
 				there's also a "meta" array which just contains an update data and a count of vehicles in the dataset
 			*/
 			let brands = []
+			let brand_types = []
 			for (let i = 0; i < data.brands.length; i++) {
+				brand = data.brands[i].name
+				for (let j = 0; j < data.data.length; j++) {
+					//console.log(data.data[j])
+					vehicle_type = data.data[j].vehicle_type
+					type = data.data[j].type
+					brand_types.push(brand + " " + vehicle_type + " " + type)
+				}
+				
 				brands.push(data.brands[i].name)
 			}
 			
-			var color = d3.scaleOrdinal().domain(brands)
-				.range(d3.schemeSet3);
+			
+			// I thought this would be neat, but it looks like there are only two vehicles types
+			// and two "types" -- car & motorbike  and 
+			// bev & phev respectively
+			// pretty neat that there are electric motorbikes in here though
+			/*var types = data.data.map((row) => {
+				return row.vehicle_type
+			});*/
+			function uniq(a) {
+				var seen = {};
+				return a.filter(function(item) {
+				return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+				});
+			}
+			uniqBrands_Types = uniq(brand_types)
+			
+			var color = d3.scaleOrdinal().domain(uniqBrands_Types)
+				.range(d3.schemeSet1);
+				
+			
 			
 			let vehicles = []
 			for (let i = 0; i < data.data.length; i++) {
 				range = data.data[i].usable_battery_size * (100 / data.data[i].energy_consumption.average_consumption)
 				
 				
-				if (range > 50 && range < 990)
+				if (data.data[i].energy_consumption.average_consumption < 100)
+				
 				{
 					vehicles.push(data.data[i])
 				}
+				//vehicles.push(data.data[i])
 
 			}
-			
 			
 			//was hoping to highlight all of a certain color upon being clicked... no luck
 			var onClick = function(d) {
@@ -174,10 +190,12 @@ No transitions necessary... but maybe if you feel like it
 				
 				+ "</span><br><strong>Model: </strong> <span style='color:red'>" + d.model	
 				+ "</span><br><strong>Trim: </strong> <span style='color:red'>" + d.variant
+				+ "</span><br><strong>EV Type: </strong> <span style='color:red'>" + d.type
+				+ "</span><br><strong>Vehicle Type: </strong> <span style='color:red'>" + d.vehicle_type
 				+ "</span><br><strong>Estimated Range (km): </strong> <span style='color:red'>" + range
 				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
-				+ "</span><br><strong>Usable Battery Size (kwH) </strong> <span style='color:red'>" + d.usable_battery_size
-				+ "</span><br><strong>Energy Consumption / 100km </strong> <span style='color:red'>" + d.energy_consumption.average_consumption
+				+ "</span><br><strong>Usable Battery Size (kwH): </strong> <span style='color:red'>" + d.usable_battery_size
+				+ "</span><br><strong>Energy Consumption / 100km: </strong> <span style='color:red'>" + d.energy_consumption.average_consumption
 )
 			}
 			
@@ -207,7 +225,11 @@ No transitions necessary... but maybe if you feel like it
 					metric = vehicles[i][batteryMetric]
 				}
 				
-				if (metric > maxBatteryMetric && maxBatteryMetric < 200)
+				if (metric > maxBatteryMetric 
+				&& maxBatteryMetric < 201
+				// && maxBatteryMetric < 199
+				
+				)
 				{
 					maxBatteryMetric = metric
 				}
@@ -221,7 +243,7 @@ No transitions necessary... but maybe if you feel like it
 			.call(d3.axisBottom(x));
 			//TODO: give axis label
 
-			y.domain([0, 600])
+			y.domain([0, 1000])
 			yAxis//.transition().duration(500)
 			.call(d3.axisLeft(y));
 			
@@ -236,7 +258,8 @@ No transitions necessary... but maybe if you feel like it
 				.enter()
 				.append("circle")//.transition().duration(500)
 				.on("mousemove", mouseMove)
-				//.on("mouseleave", mouseLeave)
+				//.on("mouseleave", mouseLeave) //I actually prefer not using the mouseleave function, so that the user can see 
+				// a selected vehicle longer if they so desire
 				.on("mouseover", mouseOver)
 				//.on("click", onClick)
 								.attr("cx", function(d) {
@@ -254,19 +277,67 @@ No transitions necessary... but maybe if you feel like it
 				.attr("cy", function(d) {return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
 				.attr("r", 7)
 				.style("fill", function (d) {return color(d.brand);})
-				.style("opacity", .5)
+				.style("opacity", .75)
 				.style("stroke", "white")
-				
-		
-			
+
 		
 		})
 	
 	}
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+	.attr("x", 110)
+	.attr("y", 150)
+	.style("fill", "red")
+	.text("Motorcycles (in orange below) are very efficient,")//, but still range limited.")
+	
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+	.attr("x", 110)
+	.attr("y", 170)
+	.style("fill", "red")
+	.text("but still range limited.")
+	
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+	.attr("x", 110)
+	.attr("y", 190)
+	.style("fill", "red")
+	.text("Hover and see!")
+	
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+		.attr("x", 600)
+		.attr("y", 150)
+		.style("fill", "red")
+		.text("Battery size has a bigger effect on range than efficiency.")
+		
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+		.attr("x", 600)
+		.attr("y", 170)
+		.style("fill", "red")
+		.text("Passenger cars mostly have similar energy consumption.")
+	
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+		.attr("x", 500)
+		.attr("y", 60)
+		.style("fill", "red")
+		.text("Tesla is making some big promises with the 2022 Roadster.")
+	d3.select("#range").append("text")
+		.style("font-size", "12px")
+		.attr("x", 500)
+		.attr("y", 80)
+		.style("fill", "red")
+		.text("If it ever comes out, it should have the largest battery & range, by far.")		
+
+	
 	
 	d3.select("#rangeSelect").on("change", function() {
 		var selectedOption = d3.select(this).property("value")
 		clearChart();
+		d3.select("#range").html = ""
 		updateRangeChart(selectedOption)
 	});
 	
@@ -275,6 +346,8 @@ No transitions necessary... but maybe if you feel like it
 	</script>
 
 	</body>
-	<p style="font-size:10px">All vehicles with under 50km range excluded from data.</p>
+	<p style="font-size:10px">All vehicles consuming over 100kwH per 100km excluded from data.</p>
+	<p style="font-size:10px">Data source: https://github.com/chargeprice/open-ev-data.</p>
+	<p style="font-size:10px">EV type "bev" refers to a Battery Electric Vehicle, while "phev" refers to a Plug-in Hybrid Electric Vehicle.</p>
 	
 </html>
