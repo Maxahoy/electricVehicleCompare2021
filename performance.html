@@ -104,7 +104,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	 d3.select("#performance").append("text")
         .attr("transform", "translate(-25,20)rotate(-90)")
         .attr("text-anchor", "end")
-        .attr("x", -150)
+        .attr("x", -70)
         .attr("y", 90)
         .text("Time (s)").style("size:16px");
 
@@ -165,7 +165,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		d3.csv("https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/31aca7cb5036bea2f63c10304406ea1fba7b43c1/CarAndDriver_EV_dataset.csv", function(data) {
 
 			performanceData = data.sort(function(a,b) {return d3.ascending(a[selectedField], b[selectedField])})
-			console.log(performanceData);
+			
 			var makes = performanceData.map((row) => {
 			return row.make;
 			});
@@ -243,9 +243,9 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			.merge(u)
 			.transition().duration(500)
 			.attr("x", function(d) { return x(d['make_model']); })
-			.attr("y", function(d) {console.log(y(d[selectedField])); return y(d[selectedField]); })//either 0 to 60 time
+			.attr("y", function(d) {return y(d[selectedField]); })//either 0 to 60 time
 			.attr("width", x.bandwidth())
-			.attr("height", function(d) {console.log(y(d[selectedField])); return height - y(d[selectedField]); })
+			.attr("height", function(d) {return height - y(d[selectedField]); })
 			.attr('fill',function(d){ return myColor(d["make"]); })
 			
 			

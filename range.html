@@ -19,16 +19,20 @@
 	<a style="font-size:20px;color:black;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/charging.html";onClick="currentChart = chargingButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	<p></p>
-	<p>Select your minimum preferred EV range, in kilometers.</p>
-	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="0" max="1000" step="10">
+	<p>Adjust the battery size and see which EV's have the longest range.</p>
+	
+	
+	<p>Move the slider to change the vehicles shown.
+	<input id="rangeSlider" title="What is your minimum range" style="position:relative;top:2px;" type="range" min="0" max="200" step="1">
 
-   </select>
-	<p><P>
-	<svg id="range">
+<output></output>
+    </select>
+	<p><p>
 	
-	</svg>
-	
-	<script>
+		<svg id="range" width = "2000" height="450">
+		</svg>
+	<div id="tooltipDiv" style = "font-size:16px;"></div>	
+		<script>
 	
 	
 		/*
@@ -42,13 +46,11 @@ No transitions necessary... but maybe if you feel like it
 	*/
 	//for development url: https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json
 		//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
-	var dataURL = "https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json"
+	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
 
-	var margin = {top : 30, right: 100, bottom: 100, left: 100},
-		width = 1400 - margin.left - margin.right,
-		height = 300 - margin.top - margin.bottom;
-			
-		
+	var margin = {top : 20, right: 100, bottom: 100, left: 100},
+		width = 800 - margin.left - margin.right,
+		height = 450 - margin.top - margin.bottom;
 	
 	//select the svg for this page	
 	var rangeSVG = d3.select("#range")
@@ -68,24 +70,35 @@ No transitions necessary... but maybe if you feel like it
 		.attr("transform", "translate(0," + height + ")")*/
 		
 		
+
 	var x = d3.scaleLinear()
-		.range([0, width]);
-	var xAxis = rangeSVG.append("g")
-		.attr("class", "X_axis");
-	
+			.range([0, width]);
+		var xAxis = rangeSVG.append("g")
+			.attr("class", "X_axis");
 	
 	//y axis
 	var y = d3.scaleLinear()
 		.range([height, 0]);
 	var yAxis = rangeSVG.append("g")
 		.attr("class", "Y_axis");
+		
+	var tooltip = d3.select("#tooltipDiv")
+				.append("div")
+				.attr("class", "tooltip")
+				.style("background-color", "white")
+				.style("border", "solid")
+				.style("border-width", "1px")
+				.style("border-radius", "5px")
+				.style("padding", "10px")
 	
 	//update method; input is going to be based on a slider in km
-	function updateRangeChart(minimumRange) {
-	
-		//get json data & process inside function
-		//console.log("min " + minimumRange);
+	function updateRangeChart(minimumBatterySize) {		
 		
+		/*var x = d3.scaleLinear()
+			.range([minimumBatterySize, width]);
+		var xAxis = rangeSVG.append("g")
+			.attr("class", "X_axis");*/
+			
 		d3.json(dataURL, function(data) {
 			//console.log(data);
 			/*
@@ -97,12 +110,34 @@ No transitions necessary... but maybe if you feel like it
 				
 				there's also a "meta" array which just contains an update data and a count of vehicles in the dataset
 			*/
-			brands = data.brands
-			vehicles = data.data
+			//console.log(data.brands)
+			let brands = []
+			for (let i = 0; i < data.brands.length; i++) {
+				brands.push(data.brands[i].name)
+			}
+			console.log(brands)
+			
+			var color = d3.scaleOrdinal().domain(brands)
+				.range(d3.schemeSet3);
+			
+			let vehicles = []
+			for (let i = 0; i < data.data.length; i++) {
+				range = data.data[i].usable_battery_size * (100 / data.data[i].energy_consumption.average_consumption)
+				
+				
+				if (range > 50 && range < 1000)
+				{
+					vehicles.push(data.data[i])
+				}
+
+			}
+			
+			//vehicles = data.data
+			
 			maxRange = 0
-			minUsableBattery = 0
+			minUsableBattery = 999999
 			maxUsableBattery = 0
-			minAvgEnergy = 0
+			minAvgEnergy = 999999
 			maxAvgEnergy = 0
 			let remainingVehicles = [];
 			for (let i = 0; i < vehicles.length; i++) {
@@ -116,39 +151,131 @@ No transitions necessary... but maybe if you feel like it
 					minUsableBattery = vehicles[i].usable_battery_size
 				}
 				
-				if (vehicles[i].usable_battery_size > maxUsableBattery) {
+				if (vehicles[i].usable_battery_size > maxUsableBattery && vehicles[i].usable_battery_size < 199) {
 					maxUsableBattery = vehicles[i].usable_battery_size
 				}
 				
 				if (minAvgEnergy > vehicles[i].energy_consumption.average_consumption) {
-					minAvgEnergy = vehicle[i].energy_consumption.average_consumption
+					minAvgEnergy = vehicles[i].energy_consumption.average_consumption
 				}
 				
 				if (maxAvgEnergy < vehicles[i].energy_consumption.average_consumption) {
 					maxAvgEnergy = vehicles[i].energy_consumption.average_consumption
 				}
 				
+				if (vehicles[i].usable_battery_size > minimumBatterySize && vehicles[i].usable_battery_size < 199)
+				{
+					remainingVehicles.push(vehicles[i])
+				}
+
 
 			}
-			console.log("minusable " + minUsableBattery)
-			console.log("maxusable " + maxUsableBattery)
-			console.log("minavg " + minAvgEnergy)
-			console.log("maxavg " + maxAvgEnergy)
 			
-
+			var onClick = function(d) {
+				d3.selectAll("." + d.brand)
+					//.transition()
+					//.duration(200)
+					.style("opacity", 1)
+				console.log("onclick")
+			}
+				
+			var mouseOver = function(d) {
+				tooltip.style("opacity", 1)
+				//console.log("mouseover")
+			}
+			
+			var mouseMove = function(d) {
+				range = d.usable_battery_size * (100 / d.energy_consumption.average_consumption)
+				range = Math.round(range * 1) / 1
+				//console.log("mousemove")
+				tooltip.style("opacity", 1)
+				.style("left", (d3.mouse(this)[0])+"px")
+				.style("top", (d3.mouse(this)[1]) + "px")
+				.html("<strong>Make:</strong> <span style='color:red'>" + (d.brand).split("_")[0] 
+				
+				+ "</span><br><strong>Model: </strong> <span style='color:red'>" + d.model	
+				+ "</span><br><strong>Trim: </strong> <span style='color:red'>" + d.variant
+				+ "</span><br><strong>Estimated Range (km): </strong> <span style='color:red'>" + range
+				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
+				+ "</span><br><strong>Usable Battery Size (kwH) </strong> <span style='color:red'>" + d.usable_battery_size
+				+ "</span><br><strong>Energy Consumption / 100km </strong> <span style='color:red'>" + d.energy_consumption.average_consumption
+				
+				/* + 
+				":</strong> <span style='color:red'>" + 
+				d[selectedField]+ "</span>"
+				+ "<span><br><strong>EPA Combined Range (miles): </strong> <span style='color:red'>" + d["EPA combined range"]
+				+ "</span><br><strong>1/4 mile finishing speed: </strong> <span style='color:red'>" + d["1/4 Mile Speed"] + "</span>"*/)
+			}
+			
+			var mouseLeave = function(d) {
+				tooltip.transition()
+				.duration(100)
+				.style("opacity", 0)
+				//console.log("mouseleave")
+			}
+			
+			//console.log("minusable " + minUsableBattery) //5.5
+			//console.log("maxusable " + maxUsableBattery) //200
+			//console.log("minavg " + minAvgEnergy) //4.5
+			//console.log("maxavg " + maxAvgEnergy) //197
+			
 			//calculate range for all of the vehicles in the vehicles list
 			//range (km) = usable_battery_size (kwH) * (100km / avg_energy_consumption (kwH/100km))
 			// trust me I worked it out with the power of algebra
 			
-			//set up scatterplot using x axis data as usable_battery_size
-			// y axis data as range?
-			// or maybe x axis as usable_battery_size and y axis as average_consumption
-			//and color by range, plus the filter on range anyway
-			
 			//x axis attribute changes; make the x axis go from 0 to the max
+			//x.domain([minimumBatterySize, maxUsableBattery])
+			x.domain([0, maxUsableBattery])
+			xAxis//.transition().duration(500)
+			.attr("transform", "translate(0," + height + ")")
+			.call(d3.axisBottom(x));
+			//TODO: give axis label
+
+			y.domain([0, 600])
+			yAxis//.transition().duration(500)
+			.call(d3.axisLeft(y));
 			
+			/*
+				I couldn't figure out how to get data to clear out... so instead, I took the lazy way out
+				And I just draw a white circle over every dot to match the background, before drawing whichever ones I actually want to see
+				
+				This draw here basically erases everything.
+			*/
+			//console.log(rangeSVG)
 			
-			
+			rangeSVG.append("g")
+				.selectAll("dot")
+				.data(vehicles)
+				.enter()
+				.append("circle")//.transition().duration(500)
+				.attr("cx", function(d) {/*console.log( "usable battery: " + x(d.usable_battery_size) );*/ return x(d.usable_battery_size); })
+				.attr("cy", function(d) {/*console.log( "energy consumption: " + y(d.energy_consumption.average_consumption)); */return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
+				.attr("r", 7)
+				.style("fill", "white")
+				.style("opacity", 1)
+				.style("stroke", "white")
+				
+			/*
+				This draws the vehicle points that I actually want to look at
+			*/
+			//console.log(remainingVehicles.length)
+			rangeSVG.append("g")
+				.selectAll("dot")
+				.data(remainingVehicles)
+				.enter()
+				.append("circle")
+				.on("mousemove", mouseMove)
+				.on("mouseleave", mouseLeave)
+				.on("mouseover", mouseOver)
+				.on("click", onClick)
+				.attr("cx", function(d) {/*console.log( "usable battery: " + x(d.usable_battery_size) );*/ return x(d.usable_battery_size); })
+				.attr("cy", function(d) {/*console.log( "energy consumption: " + y(d.energy_consumption.average_consumption)); */return y(d.usable_battery_size * (100 / d.energy_consumption.average_consumption));})
+				.attr("r", 7)
+				.style("fill", function (d) {return color(d.brand);}).transition().duration(500)
+				.style("opacity", 1)
+				.style("stroke", "white")
+				
+			//console.log(remainingVehicles.length)
 		
 		})
 	
@@ -164,5 +291,6 @@ No transitions necessary... but maybe if you feel like it
 	</script>
 
 	</body>
+	<p style="font-size:10px">All vehicles with under 50km range excluded from data.</p>
 	
 </html>
