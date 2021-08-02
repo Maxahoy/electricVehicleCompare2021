@@ -165,8 +165,8 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			}
 			uniqBrands_Types = uniq(brand_types)
 
-			var color = d3.scaleOrdinal().domain(uniqBrands_Types)
-				.range(d3.schemeSet1);
+			var color = d3.scaleOrdinal().domain(brands)
+				.range(d3.schemeSet2);
 				
 			var colorYear = d3.scaleLinear().domain([2011, 2022])
 				.range(["blue", "orange"])
@@ -277,8 +277,8 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 						
 					})
 					.attr("r", 7)
-					//.style("fill", function (d) {return color(d.brand);})
-					.style("fill", function(d) { return colorYear(d.release_year);})
+					.style("fill", function (d) {return color(d.brand);})
+					//.style("fill", function(d) { return colorYear(d.release_year);})
 					.style("opacity", .75)
 					.style("stroke", "white")
 					
