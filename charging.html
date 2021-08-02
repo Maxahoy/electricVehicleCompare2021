@@ -26,11 +26,14 @@
 		<option value="dc_charger">DC Charging (Fast Charging)</option>	
 
     </select>
-	<p><p>
+	<p>Vehicles in blue are older; vehicles in orange are newer.<p>
 	
 		<svg id="charging" width = "2000" height="450">
 		</svg>
-	<div id="tooltipDiv" style = "font-size:16px;"></div>	
+	<div id="tooltipDiv" style = "font-size:16px;">
+		
+	</div>	
+	<p style = "font-size:16px"> Mouse over the data to see more details!</p>
 		<script>
 	
 	
@@ -47,7 +50,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	
 	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
 
-	var margin = {top : 20, right: 100, bottom: 90, left: 100},
+	var margin = {top : 20, right: 100, bottom: 20, left: 100},
 		width = 1000 - margin.left - margin.right,
 		height = 450 - margin.top - margin.bottom;
 	
@@ -78,7 +81,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		.attr("x", 1)
 		.attr("y", -100)
 		.attr("width", 1400)
-		.attr("height", 439)
+		.attr("height", 499)
 		.attr("fill", "white");
 		
 	}
@@ -164,6 +167,9 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 			var color = d3.scaleOrdinal().domain(uniqBrands_Types)
 				.range(d3.schemeSet1);
 				
+			var colorYear = d3.scaleLinear().domain([2011, 2022])
+				.range(["blue", "orange"])
+				
 			// get the vehicles data group
 			console.log(color)
 			let vehicles = []
@@ -210,6 +216,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 				+ "</span><br><strong>Trim: </strong> <span style='color:red'>" + d.variant
 				+ "</span><br><strong>EV Type: </strong> <span style='color:red'>" + d.type
 				+ "</span><br><strong>Vehicle Type: </strong> <span style='color:red'>" + d.vehicle_type
+				+ "</span><br><strong>Release Year: </strong> <span style='color:red'>" + d.release_year
 				+ "</span><br><strong>Estimated Range (km): </strong> <span style='color:red'>" + range
 				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
 				+ "</span><br><strong>Usable Battery Size (kwH): </strong> <span style='color:red'>" + d.usable_battery_size
@@ -269,10 +276,12 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 						
 					})
 					.attr("r", 7)
-					.style("fill", function (d) {return color(d.brand);})
+					//.style("fill", function (d) {return color(d.brand);})
+					.style("fill", function(d) { return colorYear(d.release_year);})
 					.style("opacity", .75)
 					.style("stroke", "white")
 					
+					console.log(colorYear(2020))
 					//TODO: add the colors for vehicle bev / phev type?
 					// also add
 					
@@ -285,7 +294,29 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		d3.select("#charging").html = ""
 		d3.select("#charging").html = ""
 		updateChargeChart(selectedOption)
+		
+	
 	});
+	
+	d3.select("#charging").append("text")
+		.style("font-size", "12px")
+		.attr("x", 260)
+		.attr("y", 60)
+		.style("fill", "red")
+		.text("Many modern vehicles have slower A/C charging speeds for home use & battery preservation.")
+	d3.select("#charging").append("text")
+		.style("font-size", "12px")
+		.attr("x", 260)
+		.attr("y", 80)
+		.style("fill", "red")
+		.text("Faster charge speeds are normally limited to dedicated D/C charge stations.")
+		
+	d3.select("#charging").append("text")
+		.style("font-size", "12px")
+		.attr("x", 600)
+		.attr("y", 300)
+		.style("fill", "red")
+		.text("Tesla was first to fast charging, but Porsche is the current fast charging king.")
 	
 	
 	updateChargeChart("ac_charger")
@@ -294,5 +325,7 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 	</script>
 
 	</body>
-	
+	<p style="font-size:10px">Actual charge speeds will be slower, since vehicles cannot always charge at maximum speeds as they get closer to 100%.</p>
+	<p style="font-size:10px">Data source: https://github.com/chargeprice/open-ev-data.</p>
+	<p style="font-size:10px">EV type "bev" refers to a Battery Electric Vehicle, while "phev" refers to a Plug-in Hybrid Electric Vehicle.</p>
 </html>

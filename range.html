@@ -39,7 +39,7 @@
 	
 	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
 
-	var margin = {top : 20, right: 100, bottom: 90, left: 100},
+	var margin = {top : 20, right: 100, bottom: 20, left: 100},
 		width = 1000 - margin.left - margin.right,
 		height = 450 - margin.top - margin.bottom;
 	
@@ -59,6 +59,7 @@
 				.style("border-width", "1px")
 				.style("border-radius", "5px")
 				.style("padding", "10px")
+				
 	
 	function clearChart() {
 		//just draw a big white rectangle over the entire SVG?
