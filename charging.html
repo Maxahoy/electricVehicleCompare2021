@@ -27,7 +27,7 @@
 
 
     </select>
-	<p>Vehicles in blue are older; vehicles in orange are newer.<p>
+	<p>Both x-axis metrics measured in kilowatts.<p>
 	
 		<svg id="charging" width = "2000" height="450">
 		</svg>
@@ -101,7 +101,12 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		
 	
 	// y and x axis labeling???
-	
+	d3.select("#charging").append("text")
+        .attr("transform", "translate(-25,20)rotate(-90)")
+        .attr("text-anchor", "end")
+        .attr("x", -70)
+        .attr("y", 90)
+        .text("Time until fully charged (hours)").style("size:16px");
 	/*
 		both ac_charger and dc_charger are included always, and have a "max_power" fieldset
 		dc_charger can be null, but the field will be there; not all cars have dc chargers after all!
