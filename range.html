@@ -25,7 +25,7 @@
 		<option value="usable_battery_size">Usable Battery Size</option>
 		<option value="energy_consumption.average_consumption">Average Energy Consumption</option>	
 
-<output></output>
+
     </select>
 	<p><p>
 	
@@ -129,7 +129,8 @@
 				
 				brands.push(data.brands[i].name)
 			}
-			
+			//console.log(brands.length + " " + "brandlength")
+			//console.log(brand_types.length + " " + "brandtype length")
 			
 			// I thought this would be neat, but it looks like there are only two vehicles types
 			// and two "types" -- car & motorbike  and 
@@ -145,7 +146,7 @@
 				});
 			}
 			uniqBrands_Types = uniq(brand_types)
-			
+			console.log(uniq(brands))
 			var color = d3.scaleOrdinal().domain(uniqBrands_Types)
 				.range(d3.schemeSet1);
 				
@@ -196,7 +197,7 @@
 				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
 				+ "</span><br><strong>Usable Battery Size (kwH): </strong> <span style='color:red'>" + d.usable_battery_size
 				+ "</span><br><strong>Energy Consumption / 100km: </strong> <span style='color:red'>" + d.energy_consumption.average_consumption
-)
+				)
 			}
 			
 			var mouseLeave = function(d) {

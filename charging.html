@@ -6,6 +6,7 @@
       <title>Electric Car Charging</title>
     </head>
 	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <body style = "font-family:verdana;font-size:20px;">
 		<div class="right" style="padding-left:20px;position:relative;font-size:36px;">
 		
@@ -18,21 +19,22 @@
 	<a href="https://maxahoy.github.io/electricVehicleCompare2021/range.html";onClick="currentChart = rangeButton();console.log('chartchoice = ' + currentChart);" style="cursor: pointer; cursor: hand; font-size:20px;color:blue;" title = "Click me to see the Range chart">. . .  the longest Range</a><br>
 	<a style="font-size:20px;color:black;" title = "Click me to see the Charging chart">  . . . the fastest Charging</a><br>
 	
+	<p>Are you interested in seeing AC or DC charging stats?</p>
 	
-	<script>
+	<select id="chargeSelect" title="Select your charging type">
+		<option value="ac_charger">AC Charging (At-Home Charging)</option>
+		<option value="dc_charger">DC Charging (Fast Charging)</option>	
+
+    </select>
+	<p><p>
+	
+		<svg id="charging" width = "2000" height="450">
+		</svg>
+	<div id="tooltipDiv" style = "font-size:16px;"></div>	
+		<script>
 	
 	
 		/*
-	##TODO:
-write the actual charts!
-For now start with getting the performance data uploaded into the github page site and read in.
-Once you can get the performance data read in, build the chart without any interactivity -- for now just automatically show it on the index.html
-Then see if you can get it to appear only when pressing the performance button
-Then see if you can get it to disappear when pressing a different button
-Then get the JSON data into the mix
-Then build the other charts
-See if you can get them to appear
-
 ev_data is at https://raw.githubusercontent.com/chargeprice/open-ev-data/master/data/ev-data.json
 Might be worth re-hosting that at a frozen point in time so you know it'll work indefinitely
 	Fork it into your own project? Or just copy and re-host it? Make sure to give them credit!!
@@ -40,43 +42,254 @@ Might be worth re-hosting that at a frozen point in time so you know it'll work 
 performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicleCompare2021/main/CarAndDriver_EV_dataset.csv
 	*/
 	
+	//for development url: https://raw.githack.com/Maxahoy/electricVehicleCompare2021/main/ev-data.json
+	//for production: https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json
 	
+	var dataURL = "https://rawcdn.githack.com/Maxahoy/electricVehicleCompare2021/d20daec3b06eec3013a8fec48acae39e6c528447/ev-data.json"
+
+	var margin = {top : 20, right: 100, bottom: 90, left: 100},
+		width = 1000 - margin.left - margin.right,
+		height = 450 - margin.top - margin.bottom;
 	
-		var margin = {top : 30, right: 30, bottom: 30, left: 30},
-			width = screen.width - margin.left - margin.right,
-			height = 400 - margin.top - margin.bottom;
+	//select the svg for this page	
+	var chargingSVG = d3.select("#charging")
+		.append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+	var tooltip = d3.select("#tooltipDiv")
+		.append("div")
+		.attr("class", "tooltip")
+		.style("background-color", "white")
+		.style("border", "solid")
+		.style("border-width", "1px")
+		.style("border-radius", "5px")
+		.style("padding", "10px")
+		
+	function clearChart() {
+	
+		//try clearing the html
+		//d3.select("#charg
+		//just draw a big white rectangle over the entire SVG?
+		chargingSVG.selectAll("dot").remove();
+		chargingSVG.append("rect")
+		.attr("x", 1)
+		.attr("y", -100)
+		.attr("width", 1400)
+		.attr("height", 439)
+		.attr("fill", "white");
+		
+	}
+	
+//x axis	
+	var x = d3.scaleLinear()
+		.range([0, width]);
+	var xAxis = chargingSVG.append("g")
+		.attr("class", "X_axis");
+	
+	//y axis
+	var y = d3.scaleLinear()
+		.range([height, 0]);
+	var yAxis = chargingSVG.append("g")
+		.attr("class", "Y_axis");	
+		
+	
+	// y and x axis labeling???
+	
+	/*
+		both ac_charger and dc_charger are included always, and have a "max_power" fieldset
+		dc_charger can be null, but the field will be there; not all cars have dc chargers after all!
+		examples include the focus electric, golf electric, nissan leaf, or any crappy first gen EV's
+		and some PHEV's too prolly
+		
+		
+	*/
+	
+	function updateChargeChart(ac_or_dc) {
+	
+		d3.json(dataURL, function(data) {
+	
+			let brands = []
+			let brand_types = []
+			let types = []
+			let vehicle_types = []
+			max_power = 0
+			max_charge_time = 0
+			for (let i = 0; i < data.brands.length; i++) {
+				brand = data.brands[i].name
+				for (let j = 0; j < data.data.length; j++) {
+					vehicle_type = data.data[j].vehicle_type
+					type = data.data[j].type
+					brand_types.push(brand + " " + vehicle_type + " " + type)
+					types.push(type)
+					vehicle_types.push(vehicle_type)
+					vehicleInfo = data.data[j]
+					
+					charge_data = data.data[j][ac_or_dc]
+					power = 0
+					if (!"null".match(charge_data))
+					{
+						power = charge_data.max_power
+					}
+					
+					if (power > max_power)
+					{
+						max_power = power
+					}
+					
+					if (power != 0)
+					{
+						estimated_charge_time = data.data[j].usable_battery_size / power
+						if (estimated_charge_time > max_charge_time)
+						{
+							max_charge_time = estimated_charge_time
+						}
+					}
+					
+				}
+				
+				brands.push(data.brands[i].name)
+			}
 			
-		var currentChart;
-		// get svg object to body of page
-		var chartSVG = d3.select
+			function uniq(a) {
+				var seen = {};
+				return a.filter(function(item) {
+				return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+				});
+			}
+			uniqBrands_Types = uniq(brand_types)
+
+			var color = d3.scaleOrdinal().domain(uniqBrands_Types)
+				.range(d3.schemeSet1);
+				
+			// get the vehicles data group
+			console.log(color)
+			let vehicles = []
+			for (let i = 0; i < data.data.length; i++)
+			{
+				// only if there is a charger present
+				power = 0
+				charge_data = data.data[i][ac_or_dc]
+				if (!"null".match(charge_data))
+				{
+					vehicles.push(data.data[i])
+				}
+				
+				
+			}
+
+			/* Looks like the Porsche Taycan has both the fastest AC and DC chargin, at 43 kw and 270 kw respectively
+			Obvs not for the entire charge curves but like still
+			that do be fast though
+			
+			*/
+			
+			var mouseOver = function(d) { 
+				tooltip.style("opacity", 1)
+			}
+			
+			var mouseMove = function(d) {
+				range = d.usable_battery_size * (100 / d.energy_consumption.average_consumption)
+				range = Math.round(range * 1) / 1
+				dc_speed = "N/A"
+				if (!"null".match(d.dc_charger))
+				{
+					dc_speed = d.dc_charger.max_power
+				}
+				
+				tooltip.style("opacity", 1)
+				.style("left", (d3.mouse(this)[0])+"px")
+				.style("top", (d3.mouse(this)[1]) + "px")
+				
+				
+				.html("<strong>Make:</strong> <span style='color:red'>" + (d.brand).split("_")[0] 
+				
+				+ "</span><br><strong>Model: </strong> <span style='color:red'>" + d.model	
+				+ "</span><br><strong>Trim: </strong> <span style='color:red'>" + d.variant
+				+ "</span><br><strong>EV Type: </strong> <span style='color:red'>" + d.type
+				+ "</span><br><strong>Vehicle Type: </strong> <span style='color:red'>" + d.vehicle_type
+				+ "</span><br><strong>Estimated Range (km): </strong> <span style='color:red'>" + range
+				+ "</span><br><strong>Estimated Range (mi): </strong> <span style='color:red'>" + Math.round((range/1.609))/1
+				+ "</span><br><strong>Usable Battery Size (kwH): </strong> <span style='color:red'>" + d.usable_battery_size
+				+ "</span><br><strong>Max A/C Charge Speed: </strong> <span style='color:red'>" + d.ac_charger.max_power
+				+ "</span><br><strong>Max D/C Fast Charge Speed: </strong> <span style='color:red'>" + dc_speed
+				)
+			}
+				
+			var mouseLeave = function(d) {
+				tooltip.transition()
+				.duration(100)
+				.style("opacity", 0)
+			}
+			
+			
+			//maybe make x axis be ac charging speed, and y axis be dc charging max speed?
+			x.domain([0, max_power])
+			xAxis.attr("transform", "translate(0," + height + ")")
+			.call(d3.axisBottom(x));
+			
+			y.domain([0, max_charge_time])
+			yAxis
+			.call(d3.axisLeft(y));
+			
+			
+			chargingSVG.append("g")
+				.selectAll("dot")
+				.data(vehicles)
+				.enter()
+				.append("circle")
+				.on("mousemove", mouseMove)
+				.on("mouseover", mouseOver)
+					.attr("cx", function(d) {
+						//x is going to either ac_charger.max_power or dc_charger.max_power
+						charge_data = d[ac_or_dc]
+						power = 0
+						if (!"null".match(charge_data))
+						{
+							power = charge_data.max_power
+						}
+						return x(power)
+					})
+					.attr("cy", function(d) {
+						//y is either going to be charge time estimated with ac_charger.max_power or dc_charger.max_power
+						//divided by d.usable_battery_size
+						charge_data = d[ac_or_dc]
+						power = 0
+						battery_size = d.usable_battery_size
+						if (!"null".match(charge_data))
+						{
+							power = charge_data.max_power
+							estimated_time = battery_size/power
+							if (estimated_time > 10){
+							}
+							return y(estimated_time)
+						}
+						
+					})
+					.attr("r", 7)
+					.style("fill", function (d) {return color(d.brand);})
+					.style("opacity", .75)
+					.style("stroke", "white")
+					
+					//TODO: add the colors for vehicle bev / phev type?
+					// also add
+					
+		})
+	}
 	
-		//A set of functions to change the chart
-		function performanceButton() {
-			changeChart("Performance");
-			return "Performance";
-		}
-		function rangeButton() {
-			changeChart("Range");
-			return "Range";
-		}
-		function chargingButton() {
-			changeChart("Charging");
-			return "Charging";
-		}
-		
-		// a function to show one of the three charts
-		function changeChart(chartChoice)
-		{
-			if (chartChoice === "Performance") {
-				//showPerformanceChart();
-			} else if (chartChoice === "Range") {
-				//showRangeChart();
-			} else if (chartChoice === "Charging") {
-				//showChargingChart();
-			}	
-			//console.log("chartchoice = " + currentChart);
-		}
-		
+	d3.select("#chargeSelect").on("change", function() {
+		var selectedOption = d3.select(this).property("value")
+		clearChart();
+		d3.select("#charging").html = ""
+		d3.select("#charging").html = ""
+		updateChargeChart(selectedOption)
+	});
+	
+	
+	updateChargeChart("ac_charger")
+	
 		
 	</script>
 
