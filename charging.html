@@ -313,6 +313,13 @@ performance data is at https://raw.githubusercontent.com/Maxahoy/electricVehicle
 		
 	d3.select("#charging").append("text")
 		.style("font-size", "12px")
+		.attr("x", 430)
+		.attr("y", 170)
+		.style("fill", "red")
+		.text("DC charging starts at about 20 kw -- faster than A/C charging in most cases.")
+		
+	d3.select("#charging").append("text")
+		.style("font-size", "12px")
 		.attr("x", 600)
 		.attr("y", 300)
 		.style("fill", "red")
